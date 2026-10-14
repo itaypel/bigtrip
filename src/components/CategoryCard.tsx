@@ -5,6 +5,28 @@ import { ItemRow } from './ItemRow';
 import type { PackingCategory } from '../data/packingList';
 import type { CheckedMap } from '../lib/storage';
 import { rtl, rtlText } from '../lib/rtl';
+import { useReduceMotion } from '../lib/useReduceMotion';
+
+// The source data prefixes every category with the same 📌, which tells them apart
+// from nothing. Swap in a distinct icon at display time; the data stays untouched.
+const CATEGORY_ICONS: Record<string, string> = {
+  'מסמכים חשובים': '📄',
+  'ביגוד והנעלה': '👕',
+  'אלקטרוניקה': '🔌',
+  'בריאות ורפואה': '💊',
+  'טיפוח והיגיינה': '🧴',
+  'כסף וניהול פיננסי': '💵',
+  'נוחות וטיסה': '✈️',
+  'ביטחון ובטיחות': '🔒',
+  'פנאי': '🎲',
+  'דברים שלא לשכוח': '✅',
+};
+
+function displayTitle(title: string) {
+  const name = title.replace(/^📌\s*/, '');
+  const icon = CATEGORY_ICONS[name];
+  return icon ? `${icon} ${name}` : title;
+}
 
 type Props = {
   category: PackingCategory;
@@ -25,17 +47,22 @@ function CategoryCardBase({
   const done = category.items.filter((i) => checked[i.id]).length;
   const complete = done === total;
 
+  const title = displayTitle(category.title);
+  const reduceMotion = useReduceMotion();
+
   const rotation = useRef(new Animated.Value(expanded ? 1 : 0)).current;
   useEffect(() => {
     Animated.timing(rotation, {
       toValue: expanded ? 1 : 0,
-      duration: 220,
+      duration: reduceMotion ? 0 : 220,
       useNativeDriver: true,
     }).start();
-  }, [expanded, rotation]);
+  }, [expanded, rotation, reduceMotion]);
 
   const toggle = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.create(220, 'easeInEaseOut', 'opacity'));
+    if (!reduceMotion) {
+      LayoutAnimation.configureNext(LayoutAnimation.create(220, 'easeInEaseOut', 'opacity'));
+    }
     onToggleExpanded(category.title);
   };
 
@@ -49,15 +76,14 @@ function CategoryCardBase({
         onPress={toggle}
         accessibilityRole="button"
         accessibilityState={{ expanded }}
-        accessibilityLabel={`${category.title}, ${done} מתוך ${total}`}
+        accessibilityLabel={`${title}, ${done} מתוך ${total}`}
         className="min-h-[64px] flex-row items-center gap-3 px-4 py-4 active:bg-slate-800/60"
       >
         <Text
           style={rtlText}
-          numberOfLines={2}
           className={`flex-1 text-lg font-bold ${complete ? 'text-neon' : 'text-white'}`}
         >
-          {rtl(category.title)}
+          {rtl(title)}
         </Text>
 
         <View

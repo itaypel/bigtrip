@@ -25,7 +25,7 @@ function ItemRowBase({ id, label, checked, onToggle }: Props) {
       <Text
         style={rtlText}
         className={`flex-1 text-[17px] leading-6 ${
-          checked ? 'text-slate-500 line-through' : 'text-slate-100'
+          checked ? 'text-slate-400 line-through' : 'text-slate-100'
         }`}
       >
         {rtl(label)}

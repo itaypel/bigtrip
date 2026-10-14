@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Animated, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useReduceMotion } from '../lib/useReduceMotion';
 
 const NEON = '#00ff9c';
 
@@ -10,6 +11,7 @@ type Props = { checked: boolean; size?: number };
 export function NeonCheckbox({ checked, size = 30 }: Props) {
   const scale = useRef(new Animated.Value(1)).current;
   const isFirstRender = useRef(true);
+  const reduceMotion = useReduceMotion();
 
   useEffect(() => {
     // Don't "pop" every checked box when state is restored from storage on launch.
@@ -17,6 +19,7 @@ export function NeonCheckbox({ checked, size = 30 }: Props) {
       isFirstRender.current = false;
       return;
     }
+    if (reduceMotion) return;
     scale.setValue(0.7);
     Animated.spring(scale, {
       toValue: 1,
@@ -24,6 +27,7 @@ export function NeonCheckbox({ checked, size = 30 }: Props) {
       tension: 160,
       useNativeDriver: true,
     }).start();
+    // reduceMotion is read but deliberately not a dependency: only a check change should pop.
   }, [checked, scale]);
 
   return (
@@ -41,7 +45,7 @@ export function NeonCheckbox({ checked, size = 30 }: Props) {
     >
       <View
         className={`flex-1 items-center justify-center rounded-lg border-2 ${
-          checked ? 'border-neon bg-neon' : 'border-slate-600 bg-night'
+          checked ? 'border-neon bg-neon' : 'border-slate-400 bg-night'
         }`}
       >
         {checked && <Ionicons name="checkmark-sharp" size={size * 0.72} color="#05070d" />}

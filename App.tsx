@@ -11,6 +11,7 @@ import { ProgressHeader } from './src/components/ProgressHeader';
 import { CATEGORIES, TOTAL_ITEMS } from './src/data/packingList';
 import { loadChecked, saveChecked, type CheckedMap } from './src/lib/storage';
 import { rtl, rtlRoot, rtlText } from './src/lib/rtl';
+import { centeredColumn } from './src/lib/layout';
 
 const VALID_IDS = new Set(CATEGORIES.flatMap((c) => c.items.map((i) => i.id)));
 
@@ -90,7 +91,10 @@ function PackingScreen() {
 
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 32 }}
+        contentContainerStyle={[
+          centeredColumn,
+          { padding: 16, paddingBottom: insets.bottom + 32 },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {CATEGORIES.map((category) => (
@@ -103,7 +107,7 @@ function PackingScreen() {
             onToggleItem={toggleItem}
           />
         ))}
-        <Text style={rtlText} className="mt-2 text-center text-xs text-muted">
+        <Text style={rtlText} className="mt-2 text-center text-xs text-slate-400">
           {rtl('ההתקדמות נשמרת אוטומטית במכשיר')}
         </Text>
       </ScrollView>

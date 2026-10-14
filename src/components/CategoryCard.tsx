@@ -12,13 +12,13 @@ import { useReduceMotion } from '../lib/useReduceMotion';
 const CATEGORY_ICONS: Record<string, string> = {
   'מסמכים חשובים': '📄',
   'ביגוד והנעלה': '👕',
-  'אלקטרוניקה': '🔌',
+  אלקטרוניקה: '🔌',
   'בריאות ורפואה': '💊',
   'טיפוח והיגיינה': '🧴',
   'כסף וניהול פיננסי': '💵',
   'נוחות וטיסה': '✈️',
   'ביטחון ובטיחות': '🔒',
-  'פנאי': '🎲',
+  פנאי: '🎲',
   'דברים שלא לשכוח': '✅',
 };
 
@@ -36,13 +36,7 @@ type Props = {
   onToggleItem: (id: string) => void;
 };
 
-function CategoryCardBase({
-  category,
-  checked,
-  expanded,
-  onToggleExpanded,
-  onToggleItem,
-}: Props) {
+function CategoryCardBase({ category, checked, expanded, onToggleExpanded, onToggleItem }: Props) {
   const total = category.items.length;
   const done = category.items.filter((i) => checked[i.id]).length;
   const complete = done === total;
@@ -86,9 +80,7 @@ function CategoryCardBase({
           {rtl(title)}
         </Text>
 
-        <View
-          className={`rounded-full px-3 py-1 ${complete ? 'bg-neon/15' : 'bg-cyber/10'}`}
-        >
+        <View className={`rounded-full px-3 py-1 ${complete ? 'bg-neon/15' : 'bg-cyber/10'}`}>
           <Text className={`text-sm font-bold ${complete ? 'text-neon' : 'text-cyber'}`}>
             {complete ? '✓ הושלם' : `${done}/${total}`}
           </Text>

@@ -5,6 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { rtl, rtlText } from '../lib/rtl';
 import { useReduceMotion } from '../lib/useReduceMotion';
 import { centeredColumn } from '../lib/layout';
+import type { SyncStatus } from '../lib/usePackingState';
+import { SyncButton } from './SyncButton';
 
 const NEON = '#00ff9c';
 const CYBER = '#22d3ee';
@@ -13,9 +15,11 @@ type Props = {
   packed: number;
   total: number;
   onReset: () => void;
+  syncStatus: SyncStatus;
+  onOpenSync: () => void;
 };
 
-export function ProgressHeader({ packed, total, onReset }: Props) {
+export function ProgressHeader({ packed, total, onReset, syncStatus, onOpenSync }: Props) {
   const insets = useSafeAreaInsets();
   const ratio = total === 0 ? 0 : packed / total;
   const percent = Math.round(ratio * 100);
@@ -52,15 +56,18 @@ export function ProgressHeader({ packed, total, onReset }: Props) {
               {rtl('רשימת אריזה')}
             </Text>
           </View>
-          <Pressable
-            onPress={onReset}
-            accessibilityRole="button"
-            accessibilityLabel="איפוס הרשימה"
-            hitSlop={10}
-            className="h-11 w-11 items-center justify-center rounded-full border border-edge bg-panel active:bg-slate-800"
-          >
-            <Ionicons name="refresh" size={20} color="#94a3b8" />
-          </Pressable>
+          <View className="flex-row gap-2">
+            <SyncButton status={syncStatus} onPress={onOpenSync} />
+            <Pressable
+              onPress={onReset}
+              accessibilityRole="button"
+              accessibilityLabel="איפוס הרשימה"
+              hitSlop={10}
+              className="h-11 w-11 items-center justify-center rounded-full border border-edge bg-panel active:bg-slate-800"
+            >
+              <Ionicons name="refresh" size={20} color="#94a3b8" />
+            </Pressable>
+          </View>
         </View>
 
         <View className="mt-5 flex-row items-end justify-between">

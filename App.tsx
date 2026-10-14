@@ -1,7 +1,7 @@
 import './global.css';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Platform, ScrollView, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,7 +13,13 @@ import { loadChecked, saveChecked, type CheckedMap } from './src/lib/storage';
 import { rtl, rtlRoot, rtlText } from './src/lib/rtl';
 import { centeredColumn } from './src/lib/layout';
 
-const VALID_IDS = new Set(CATEGORIES.flatMap((c) => c.items.map((i) => i.id)));
+if (Platform.OS === 'web') {
+  // Lets the browser use Hebrew fonts/hyphenation and put the scrollbar on the left.
+  document.documentElement.lang = 'he';
+  document.documentElement.dir = 'rtl';
+}
+
+const VALID_IDS =new Set(CATEGORIES.flatMap((c) => c.items.map((i) => i.id)));
 
 function PackingScreen() {
   const insets = useSafeAreaInsets();
@@ -58,16 +64,21 @@ function PackingScreen() {
   }, []);
 
   const resetAll = useCallback(() => {
-    Alert.alert('לאפס את הרשימה?', 'כל הסימונים יימחקו. לא ניתן לבטל פעולה זו.', [
+    const title = 'לאפס את הרשימה?';
+    const message = 'כל הסימונים יימחקו. לא ניתן לבטל פעולה זו.';
+    const reset = () => {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
+      setChecked({});
+    };
+
+    // react-native-web's Alert.alert is a no-op, so the browser gets a native confirm().
+    if (Platform.OS === 'web') {
+      if (window.confirm(`${title}\n${message}`)) reset();
+      return;
+    }
+    Alert.alert(title, message, [
       { text: 'ביטול', style: 'cancel' },
-      {
-        text: 'איפוס',
-        style: 'destructive',
-        onPress: () => {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
-          setChecked({});
-        },
-      },
+      { text: 'איפוס', style: 'destructive', onPress: reset },
     ]);
   }, []);
 
